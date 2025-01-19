@@ -1,0 +1,46 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
+
+- task: PowerPlatformExportSolution@2
+  inputs:
+    authenticationType: 'PowerPlatformSPN'
+    Managed: true
+    PowerPlatformSPN: 'service_connection_dev'
+    SolutionName: 'Copilot Test Solution'
+    SolutionOutputFile: 'solutions/dev_solution_managed.zip'
+    AsyncOperation: true
+    MaxAsyncWaitTime: '60'
+
+- task: PowerPlatformUnpackSolution@2
+  inputs:
+    SolutionInputFile: 'solutions/dev_solution_unmanaged.zip'
+    SolutionTargetFolder: 'solution_unpacked'
+    SolutionType: 'Unmanaged'
+
+- task: CmdLine@2
+  inputs:
+    script: |
+      git config user.email "email"
+      git config user.name "name"
+      git checkout -B main
+      git pull origin
+      git add --all
+      git commit -m "code commit"
+      git push https://7WXMvVeul1HIfi0rRa6oD7MOyvWKg15anZHi1wjF8BrS8FoHXEyyJQQJ99BAACAAAAAvZQC8AAASAZDOw6Tp@dev.azure.com/bcasasole0529/_git/Copilot%20Studio%20ALM
